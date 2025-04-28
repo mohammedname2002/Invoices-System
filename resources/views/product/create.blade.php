@@ -60,7 +60,7 @@
                         <div class="col-lg-6">
                             <label for="example-text-input" class="form-label" >Company Name</label>
                             <div class="col-sm-10">
-                                <select class="form-control" id="type" name="company_id">
+                                <select class="form-control" id="type" name="company_id" required>
                                     <option value=" ">Select The Company</option>
 
                                     @foreach ( $companies as $company)
@@ -100,7 +100,15 @@
                                  @enderror
 
                             </div>
+                            <div class="mb-3 col-md-3">
+                                <label for="quantity" class="form-label">Quantity</label>
+                                <input type="number"  name="quantity" class="form-control {{ $errors->has('quantity') ? 'is-invalid' : '' }}"
+                                                value="{{ old('quantity') }}" id="discount"  >
+                                @error('quantity')
+                                <span class="text-danger">{{ $message }}</span>
+                                 @enderror
 
+                            </div>
                             <div class="mb-3 col-md-3">
                                 <label for="discount" class="form-label">Vat %</label>
                                 <input type="number"  name="vat" class="form-control" id="discount">

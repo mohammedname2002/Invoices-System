@@ -45,6 +45,7 @@ class ProductService{
         $product=Product::create([
             'company_id'=>$request->company_id,
             'name'=>$request->product_name,
+            'quantity'=>$request->quantity,
             'vat'=>$request->vat,
             'price'=>$request->price,
             'date_of_create'=>$request->date_of_create,
@@ -61,6 +62,7 @@ class ProductService{
         $product->update([
                 'company_id'=>$request->company_id,
                     'name'=>$request->product_name,
+                    'quantity'=>$request->quantity,
                     'vat'=>$request->vat,
                     'price'=>$request->price,
                     'date_of_create'=>$request->date_of_create,

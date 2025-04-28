@@ -90,6 +90,16 @@
                             </div>
 
                             <div class="mb-3 col-md-3">
+                                <label for="quantity" class="form-label">Quantity</label>
+                                <input type="number" name="quantity" class="form-control" id="quantity" value="{{ $product->quantity }}">
+                                @if ($errors->has('quantity'))
+                                    <div class="invalid-feedback">
+                                        {{ $errors->first('quantity') }}
+                                    </div>
+                                @endif
+                            </div>
+
+                            <div class="mb-3 col-md-3">
                                 <label for="vat" class="form-label">VAT %</label>
                                 <input type="number" name="vat" class="form-control" id="vat" value="{{ $product->vat }}">
                                 @if ($errors->has('vat'))

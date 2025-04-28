@@ -1,13 +1,14 @@
 <?php
 
 namespace App\Services;
-use Barryvdh\DomPDF\PDF;
-
-
 use App\Models\Company;
+
+
 use App\Models\Invoice;
 use App\Models\Product;
+use Barryvdh\DomPDF\PDF;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 class InvoiceService
@@ -47,9 +48,19 @@ class InvoiceService
 
     public function store($request)
     {
-        $latestInvoice = Invoice::latest()->first();
-        $nextInvoiceNumber = $latestInvoice ? $latestInvoice->id + 1 : 1;
-        $invoiceNumber = 'INV-' . date('Y') . '-' . str_pad($nextInvoiceNumber, 6, '0', STR_PAD_LEFT);
+        $currentInvoiceNumber = Cache::rememberForever('invoice_number', function () {
+            return 11; // Start from 11
+        });
+
+        $nextInvoiceNumber = $currentInvoiceNumber + 1;
+        Cache::forever('invoice_number', $nextInvoiceNumber);
+
+        // Generate the invoice number
+        $invoiceNumber = 'INV-' . date('Y') . '-' . str_pad($currentInvoiceNumber, 6, '0', STR_PAD_LEFT);
+
+$fromDate = $request->input('from');
+$toDate = $request->input('to');
+
 
         $fromDate = $request->input('from');
         $toDate = $request->input('to');
@@ -63,20 +74,36 @@ class InvoiceService
             //              return redirect()->back();
             //           }
 
-        $product = Invoice::create([
+        $invoice = Invoice::create([
+            'company_id' => $request->company_id,
+            'from' => $request->from,
+            'to' => $request->to,
+             'invoice_number' => $invoiceNumber,
+
+            'status' => $request->status,
+            'date_of_create' => Carbon::now(),
+        ]);
+        $nextInvoiceNumber++;
+        return $invoice;
+    }
+
+    public function update($id, $request) {
+        $nextInvoiceNumber = 11; // starting point
+        $invoiceNumber = 'INV-' . date('Y') . '-' . str_pad($nextInvoiceNumber, 6, '0', STR_PAD_LEFT);
+
+
+        $invoice = $this->find($id , ['*']);
+        $invoice->update([
             'company_id' => $request->company_id,
             'from' => $request->from,
             'to' => $request->to,
             'invoice_number' => $invoiceNumber,
             'status' => $request->status,
-
             'date_of_create' => Carbon::now(),
         ]);
 
-        return $product;
-    }
 
-    public function update($id, $request) {}
+    }
 
     public function delete($id) {
 
@@ -90,9 +117,14 @@ class InvoiceService
 
     public function show($id){
         $invoice = $this->find($id , ['*']);
-        $invoices = Product::whereBetween('date_of_create', [$invoice->from , $invoice->to])->with('company')->get();
+         $companyId = $invoice->company->id;
 
-        return $invoices;
+         $invoices = Product::whereBetween('date_of_create', [$invoice->from, $invoice->to])
+         ->where('company_id', $companyId) // Add this line to filter by company
+         ->with('company') // To include the company relation
+         ->get();
+
+     return $invoices;
     }
 
 }

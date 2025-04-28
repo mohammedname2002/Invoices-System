@@ -24,7 +24,13 @@ class CompanyController extends Controller
         return view('company.index', ['companies'=>$companies]);
 
     }
+    public function indexApi()
+    {
+        $paginate=request()->paginate??10;
+        $companies=$this->companyService->index([], [], ['*'], $paginate);
+        return response()->json($companies);
 
+    }
     /**
      * Show the form for creating a new resource.
      * @return Renderable

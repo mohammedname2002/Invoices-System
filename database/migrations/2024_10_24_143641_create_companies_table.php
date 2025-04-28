@@ -16,6 +16,8 @@ return new class extends Migration
         Schema::create('companies', function (Blueprint $table) {
             $table->id();
             $table->string('name')->nullable()->default('Company');
+            $table->string('trn')->nullable()->default('trn');
+            $table->string('address')->nullable()->default('address');
             $table->float('discount', 5, 2)->default(0); // Discount in percentage
             $table->timestamps();
           });

@@ -63,7 +63,20 @@
                             <span class="text-danger">{{ $message }}</span>
                              @enderror
                         </div>
-
+                        <div class="mb-3 col-md-6">
+                            <label for="inputAddress" class="form-label">TRN For Company </label>
+                            <input type="text"  name="trn" class="form-control" id="inputAddress" placeholder="TRN For Name ">
+                            @error('trn')
+                            <span class="text-danger">{{ $message }}</span>
+                             @enderror
+                        </div>
+                        <div class="mb-3 col-md-6">
+                            <label for="inputAddress" class="form-label">Company Address </label>
+                            <input type="text"  name="address" class="form-control" id="inputAddress" placeholder="Company dress ">
+                            @error('address')
+                            <span class="text-danger">{{ $message }}</span>
+                             @enderror
+                        </div>
                     </div>
 
                         <div class="row">

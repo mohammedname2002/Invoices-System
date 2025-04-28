@@ -19,9 +19,11 @@ return new class extends Migration
             $table->foreign('company_id')->references('id')->on('companies')->onDelete('cascade'); // Define foreign key
             $table->string('name'); // Invoice item name
             $table->float('price', 10, 2); // Price before VAT
+            $table->integer('quantity'); 
             $table->dateTime('date_of_create'); // Date and time of creation
             $table->float('vat', 5, 2)->default(0); // VAT percentage
             $table->timestamps();
+
                 });
     }
 

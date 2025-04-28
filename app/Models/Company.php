@@ -14,7 +14,7 @@ class Company extends Model
     use HasFactory;
 
 
-    protected $fillable = ['name', 'discount'];
+    protected $fillable = ['name', 'discount' , 'trn' , 'address'];
 
     public function products(): HasMany
     {

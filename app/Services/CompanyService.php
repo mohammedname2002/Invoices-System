@@ -43,6 +43,9 @@ class CompanyService{
 
         $company=Company::create([
             'name'=>$request->name,
+            'trn'=>$request->trn,
+            'address'=>$request->address,
+
             'discount'=>$request->discount,
         ]);
 
@@ -54,6 +57,8 @@ class CompanyService{
         $company = $this->find($id , ['*']);
 
         $company->update([
+            'trn'=>$request->trn,
+            'address'=>$request->address,
             'name'=>$request->company_name,
             'discount'=>$request->discount,
         ]);

@@ -60,7 +60,28 @@
                                 @endif
                             </div>
                         </div>
-
+                        <div class="row">
+                            <div class="mb-3 col-md-6">
+                                <label for="inputAddress" class="form-label">TRN For Comapny </label>
+                                <input type="text" name="trn" class="form-control" id="inputAddress" value="{{ old('trn', $company->trn) }}" placeholder="Trn Name">
+                                @if ($errors->has('trn'))
+                                <div class="invalid-feedback">
+                                    {{ $errors->first("trn") }}
+                                </div>
+                                @endif
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="mb-3 col-md-6">
+                                <label for="inputAddress" class="form-label">Company Address</label>
+                                <input type="text" name="address" class="form-control" id="inputAddress" value="{{ old('address', $company->address) }}" placeholder="address Name">
+                                @if ($errors->has('address'))
+                                <div class="invalid-feedback">
+                                    {{ $errors->first("address") }}
+                                </div>
+                                @endif
+                            </div>
+                        </div>
                         <div class="row">
                             <div class="mb-3 col-md-6">
                                 <label for="discount" class="form-label">Discount %</label>

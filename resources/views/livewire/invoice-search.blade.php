@@ -31,6 +31,10 @@
                                     @csrf
                                     <button type="submit" class="btn btn-success waves-effect waves-light">Preview <i class="mdi mdi-eye me-1" ></i></button>
                                 </form>
+                                <form action="{{ route('invoice.edit', $invoice->id) }}" method="get">
+                                    @csrf
+                                    <button type="submit" class="btn btn-success waves-effect waves-light">edit <i class="mdi mdi-eye me-1" ></i></button>
+                                </form>
                                 <form action="{{ route('invoice.delete', $invoice->id) }}" id="deleteform{{ $invoice->id }}" method="POST">
                                     @csrf
                                     <button type="button" onclick="JSconfirm(event, {{ $invoice->id }})" class="btn btn-danger waves-effect waves-light">Delete <i class="mdi mdi-close"></i></button>

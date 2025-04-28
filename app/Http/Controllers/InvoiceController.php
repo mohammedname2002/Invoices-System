@@ -15,6 +15,7 @@ use App\Services\InvoiceService;
 use App\Http\Requests\InvoiceRequest;
 use Barryvdh\Snappy\Facades\SnappyPdf;
 use App\Http\Requests\UpdateInvoiceRequest;
+use Log;
 
 class InvoiceController extends Controller
 {
@@ -85,7 +86,7 @@ class InvoiceController extends Controller
      * @param  \App\Models\Invoice  $invoice
      * @return \Illuminate\Http\Response
      */
-    public function update($id, UpdateInvoiceRequest $request)
+    public function update($id, InvoiceRequest $request)
     {
 
         $this->invoiceService->update($id, $request);
@@ -107,10 +108,13 @@ class InvoiceController extends Controller
 
     public function show($id)
 
-            {     $products  = $this->invoiceService->show($id);
-                $invoiceName = Invoice::where('id' , $id)->with(['company'])->first();
+            {
+
+
+            $products  = $this->invoiceService->show($id);
+            $invoiceName = Invoice::where('id' , $id)->with(['company'])->first();
         // Fetch all products that belong to this invoice's company
-        $products  = Product::where('company_id', $invoiceName->company->id)->get();
+        // $products  = Product::where('company_id', $invoiceName->company->id)->get();
 
         $totalWithVatAndDiscount = $products->sum(function ($product) {
             return $product->getPriceWithVatAndDiscount();
@@ -118,20 +122,34 @@ class InvoiceController extends Controller
         $totalWithVat = $products->sum(function ($product) {
             return $product->getPriceWithVat(); // Assuming this method is defined to calculate price with VAT
         });
+
+
+        $totalTotal = $products->sum(function ($product )use($invoiceName) {
+
+            $productPriceWithDiscont = $product->price * $product->quantity - ($product->price * $product->quantity * ($invoiceName->company->discount / 100)) ;
+            $productPriceWithDiscontAndVat = $productPriceWithDiscont + ($productPriceWithDiscont * $product->vat / 100) ;
+
+return $productPriceWithDiscontAndVat ;
+});
 
 return  view('invoice.show', [
             'products'=>$products
           , 'invoiceName'=>$invoiceName
          ,'totalWithVat'=>$totalWithVat
-            ,'totalWithVatAndDiscount'=>$totalWithVatAndDiscount    ,   ]);
+            ,'totalWithVatAndDiscount'=>$totalWithVatAndDiscount
+            ,'totalTotal'=>$totalTotal    ,
+
+      ]);
     }
 
 
     public function downloadInvoice($id)
     {
-        $products  = $this->invoiceService->show($id);
-        $invoiceName = Invoice::where('id' , $id)->with('company')->first();
-        $Product = Product::where('company_id' , $invoiceName->company->id)->first();
+        \Log::info("Download Invoice Process Started");
+
+        $products = $this->invoiceService->show($id);
+        $invoiceName = Invoice::where('id', $id)->with(['company'])->first();
+
         $totalWithVatAndDiscount = $products->sum(function ($product) {
             return $product->getPriceWithVatAndDiscount();
         });
@@ -139,25 +157,36 @@ return  view('invoice.show', [
             return $product->getPriceWithVat(); // Assuming this method is defined to calculate price with VAT
         });
 
+        \Log::info("Data fetched: ", [
+            'products' => $products,
+            'invoiceName' => $invoiceName,
+            'totalWithVat' => $totalWithVat,
+            'totalWithVatAndDiscount' => $totalWithVatAndDiscount
+        ]);
 
-    // Generate the HTML content by rendering the Blade template
-    $html = view('invoice.download', [
-        'products' => $products,
-        'invoiceName' => $invoiceName,
-        'totalWithVat' => $totalWithVat,
-        'totalWithVatAndDiscount' => $totalWithVatAndDiscount
-    ])->render();
+        $html = view('invoice.download', [
+            'products' => $products,
+            'invoiceName' => $invoiceName,
+            'totalWithVat' => $totalWithVat,
+            'totalWithVatAndDiscount' => $totalWithVatAndDiscount
+        ])->render();
 
-    // Initialize mPDF and load the HTML
-        // Initialize mPDF and load the HTML
-        $mpdf = new Mpdf();
+        // Check if HTML is generated correctly
+        \Log::info("HTML content generated");
 
-        // Write the HTML to the PDF
-        $mpdf->WriteHTML($html);
+        // Initialize mPDF
+        try {
+            $mpdf = new \Mpdf\Mpdf();
+            $mpdf->WriteHTML($html);
 
-        // Output to browser for download
-        $mpdf->Output('invoice_' . $invoiceName->id . '.pdf', 'D'); // 'D' forces download
+            // Force the PDF download
+            $mpdf->Output('invoice_' . $invoiceName->id . '.pdf', 'D'); // 'D' forces download
 
+            \Log::info("PDF generated and download triggered.");
+        } catch (\Mpdf\MpdfException $e) {
+            \Log::error('mPDF Error: ' . $e->getMessage());
+            return response()->json(['error' => 'PDF generation failed!'], 500);
+        }
+    }
 
-}
 }

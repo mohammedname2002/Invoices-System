@@ -26,6 +26,7 @@ class ProductRequest extends FormRequest
         return [
             'product_name' => 'required|string|max:1000|min:3',
             'price' => 'required|numeric|min:1|max:100000',
+            'quantity' => 'required|numeric|min:1|max:100000',
             'vat' => 'required|numeric|min:1|max:10000',
             'date_of_create' => 'sometimes|string',
         ];
@@ -46,6 +47,11 @@ class ProductRequest extends FormRequest
             'price.max' => 'The price may not exceed 100,000.',
             'price.min' => 'The price must be at least 1.',
             'price.numeric' => 'The price must be a valid number.',
+                 // Price
+                 'quantity.required' => 'The quantity is required.',
+                 'quantity.max' => 'The quantity may not exceed 100,000.',
+                 'quantity.min' => 'The quantity must be at least 1.',
+                 'quantity.numeric' => 'The quantity must be a valid number.',
 
             // VAT
             'vat.required' => 'The VAT is required.',
